@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -36,5 +37,32 @@ const searchDatabase = async (term) => {
         throw err;
     }
 };
+
+// Function to register a new user
+const registerUser = async (name, email, password) => {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const query = 'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *';
+    const values = [name, email, hashedPassword];
+    try {
+        const result = await pool.query(query, values);
+        return result.rows[0];
+    } catch (err) {
+        console.error('Error registering new user', err);
+        throw err;
+    }
+};
+
+// Function to retrieve a user by email
+const getUserByEmail = async (email) => {
+    const query = 'SELECT * FROM users WHERE email = $1';
+    try {
+        const result = await pool.query(query, [email]);
+        return result.rows[0];
+    } catch (err) {
+        console.error('Error retrieving user by email', err);
+        throw err;
+    }
+};
+
 
 module.exports = { searchDatabase };
