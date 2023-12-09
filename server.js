@@ -1,25 +1,32 @@
 const express = require('express');
 const cors = require('cors');
+const userRoutes = require('./src/routes/loginsignupRoutes.js'); 
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { searchDatabase } = require('./src/config/db.js');
 require('dotenv').config();
 
+
 // Create express app
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(userRoutes);
+
 
 const tripRoutes = require('./src/routes/tripRoutes.js');
 const expenseRoutes = require('./src/routes/expenseRoutes.js');
 const itineraryRoutes = require('./src/routes/itineraryRoutes.js');
 const mediaRoutes = require('./src/routes/mediaRoutes.js');
+const loginsignupRoutes = require('./src/routes/loginsignupRoutes');
+
 
 app.use('/api/trips', tripRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/itinerary', itineraryRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/loginsignup', loginsignupRoutes);
 
 // Database connection using environment variables from .env file
 const pool = new Pool({
@@ -89,7 +96,7 @@ app.get('/api/search', async (req, res) => {
 
 
 // Start the server
-const PORT = process.env.PORT || 3008;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });
