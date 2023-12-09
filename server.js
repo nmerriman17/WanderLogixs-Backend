@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const userRoutes = require('./src/routes/loginsignupRoutes.js'); 
 const { Pool } = require('pg');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { searchDatabase } = require('./src/config/db.js');
 require('dotenv').config();
@@ -51,7 +51,7 @@ app.get('/', (req, res) => {
 app.post('/api/signup', async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10); // 10 is the number of salt rounds
+        const hashedPassword = await bcryptjs.hash(password, 10); // 10 is the number of salt rounds
         await pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3)', [name, email, hashedPassword]);
         
         
@@ -69,7 +69,7 @@ app.post('/api/login', async (req, res) => {
         const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         const user = result.rows[0];
 
-        if (user && await bcrypt.compare(password, user.password)) {
+        if (user && await bcryptjs.compare(password, user.password)) {
             const token = jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' });
             res.json({ token });
         } else {
@@ -96,7 +96,7 @@ app.get('/api/search', async (req, res) => {
 
 
 // Start the server
-const PORT = process.env.PORT || 8005;
+const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

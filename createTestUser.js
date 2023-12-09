@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const { Pool } = require('pg');
 require('dotenv').config();
 
@@ -11,7 +11,7 @@ const pool = new Pool({
 });
 
 const createUser = async () => {
-    const hashedPassword = await bcrypt.hash('testPassword123', 10); // New password
+    const hashedPassword = await bcryptjs.hash('testPassword123', 10); // New password
     try {
         const result = await pool.query(
             'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
